@@ -1,49 +1,44 @@
 #include <iostream>
-#include <fstream>
+#include <vector>
 #include <string>
+#include <fstream>
 
-using namespace std;
+void highlightKeyword(const std::string& line, const std::string& keyword) {
+    size_t pos = line.find(keyword);
+    if (pos != std::string::npos) {
+        // Print the part before the keyword
+        std::cout << line.substr(0, pos);
+        // Highlight the keyword
+        std::cout << "\033[31m" << line.substr(pos, keyword.length()) << "\033[0m"; // Red
+        // Print the part after the keyword
+        std::cout << line.substr(pos + keyword.length()) << std::endl;
+    }
+}
 
 int main(int argc, char* argv[]) {
-    // Check for the correct number of arguments
-    if (argc < 3) {
-        cout << "Usage: " << argv[0] << " <filename> <keyword>" << endl;
+    int argumentCount = argc - 1;
+ 
+    if (argumentCount < 2) {
+        std::cout << "Usage: " << argv[0] << " <filename> <keyword>" << std::endl;
         return 1;
     }
 
-    // Use pointers to access filename and keyword directly
-    const char* filename = argv[1];  // Pointer to filename argument
-    const char* keyword = argv[2];   // Pointer to keyword argument
+    std::vector<std::string> arguments(argv + 1, argv + argc);
+    const std::string& filename = arguments[0];
+    const std::string& keyword = arguments[1];
+    std::cout << "MFind search initiated for " << "\033[31m" << keyword << " in " << "\033[32m" << filename << "\033[0m" << std::endl;
 
-    // Open the file
-    ifstream inputFile(filename);
-    if (!inputFile) {
-        cerr << "Error: Could not open file '" << filename << "'" << endl;
+    std::ifstream inputFile(filename);
+    if (!inputFile.is_open()) {
+        std::cerr << "Error opening file: " << filename << std::endl;
         return 1;
     }
 
-    string line;
-    int lineNumber = 1;
-    bool found = false;
-
-    // Read the file line by line
-    while (getline(inputFile, line)) {
-        // Check for the keyword in the current line
-        if (line.find(keyword) != string::npos) {
-            cout << "Line " << lineNumber << ": " << line << endl;
-            found = true;
-        }
-        lineNumber++;
+    std::string line;
+    while (std::getline(inputFile, line)) {
+        highlightKeyword(line, keyword);
     }
-
-    // Close the file
     inputFile.close();
-
-    // If the keyword was not found, print a message
-    if (!found) {
-        cout << "Keyword '" << keyword << "' not found." << endl;
-    }
-
     return 0;
 }
 
