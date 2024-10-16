@@ -15,6 +15,8 @@ void highlightKeyword(const std::string& line, const std::string& keyword) {
     }
 }
 
+
+//ihate my life
 int main(int argc, char* argv[]) {
     int argumentCount = argc - 1;
  
